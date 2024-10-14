@@ -1,0 +1,60 @@
+@model Dictionary<string, List<string>>
+
+<div class="container-fluid">
+    @{
+        var teamList = Model.ToList();
+        int totalTeams = teamList.Count;
+        int[] teamsPerRow = { 4, 4, 2 };
+        int teamIndex = 0;
+    }
+
+    @for (int row = 0; row < teamsPerRow.Length; row++)
+    {
+        if (teamIndex >= totalTeams) break;
+        <div class="row">
+            @for (int col = 0; col < teamsPerRow[row]; col++)
+            {
+                if (teamIndex >= totalTeams) break;
+                var team = teamList[teamIndex];
+                <div class="col-md-3">
+                    <ul class="list-group">
+                        <li class="list-group-item team-name">@team.Key</li>
+                        @foreach (var name in team.Value)
+                        {
+                            <li class="list-group-item">@name</li>
+                        }
+                    </ul>
+                </div>
+                teamIndex++;
+            }
+        </div>
+        <br />
+    }
+</div>
+
+<div class="text-center">
+    <button class="btn btn-primary mb-3" onclick="changeTeamNames()">Change Team Names</button>
+</div>
+
+<script>
+    async function changeTeamNames() {
+        try {
+            const response = await fetch('/animals.txt');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const text = await response.text();
+            const animalNames = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
+            const teamNames = document.querySelectorAll('.team-name');
+            
+            // Shuffle the animal names array
+            const shuffledAnimalNames = animalNames.sort(() => 0.5 - Math.random());
+
+            teamNames.forEach((teamName, index) => {
+                teamName.textContent = `The ${shuffledAnimalNames[index]}`;
+            });
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+</script>
