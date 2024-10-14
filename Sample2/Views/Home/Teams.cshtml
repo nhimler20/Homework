@@ -38,23 +38,19 @@
 
 <script>
     async function changeTeamNames() {
-        try {
-            const response = await fetch('/animals.txt');
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+        const response = await fetch('/animals.txt');
+        if (response.ok) {
             const text = await response.text();
             const animalNames = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
             const teamNames = document.querySelectorAll('.team-name');
             
-            // Shuffle the animal names array
             const shuffledAnimalNames = animalNames.sort(() => 0.5 - Math.random());
 
             teamNames.forEach((teamName, index) => {
                 teamName.textContent = `The ${shuffledAnimalNames[index]}`;
             });
-        } catch (error) {
-            console.error('There was a problem with the fetch operation:', error);
+        } else {
+            console.error('Unable to find list of animals');
         }
     }
 </script>
